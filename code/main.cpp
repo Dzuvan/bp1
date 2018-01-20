@@ -7,18 +7,19 @@
 
 FILE* datoteka;
 FILE* pomocna_datoteka;
+char aktivna_datoteka[20];
+char trenutna[20];
+int zapis;
 
 int main() {
     return 0;
 }
 
-
 void napravi_datoteku(char* temp) {
+    printf("Kreiram datoteku...\n");
+
     struct baket baket;
     struct film film;
-    char aktivna_datoteka[20];
-    char trenutna[20];
-    int zapis;
 
     if ((datoteka = fopen(temp, "wb+")) == NULL) {
         printf("\nDatoteka %s nije kreirana!", temp);
@@ -42,7 +43,19 @@ void napravi_datoteku(char* temp) {
       }
     }
 
-    printf("\nDatoteka %s uspesno kreirana!", temp);
+    printf("\nDatoteka <%s> uspesno kreirana!", temp);
     strcpy(aktivna_datoteka, temp);
-
 }
+
+void otvori_datoteku(char* temp) {
+    printf("Otvaram...\n");
+
+    fclose(datoteka);
+    if ((datoteka = fopen(temp, "rb+")) == NULL) {
+        printf("\nDatoteka <%s> ne postoji", temp);
+        return;
+    }
+    printf("Datoteka <%s> uspesno otvorena", temp);
+    strcpy(aktivna_datoteka, temp);
+}
+

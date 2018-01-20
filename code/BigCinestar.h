@@ -33,5 +33,6 @@ struct trazi {
 
 int transformacija_kljuca(int kljuc);
 void napravi_datoteku(char* temp);
+void otvori_datoteku(char* temp);
 
 #endif /* BIGCINESTAR_H */
