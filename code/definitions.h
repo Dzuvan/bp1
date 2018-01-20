@@ -8,6 +8,7 @@
 #define MAX_NAZIV 50 // Maksimalan broj karaktera za naziv filma.
 #define MAX_SALA 5 //  Oznaka bioskopske sale u kojoj se film prikazuje.
 #define MAX_TRAJANJE 200  // Maksimalna dužina trajanja filma u minutima.
+#define DATE_TIME 16 // Broj cifara za datum i vreme.
 
 #endif /* DEFINITIONS_H */
 

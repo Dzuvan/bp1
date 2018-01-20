@@ -28,17 +28,18 @@ void napravi_datoteku(char* temp) {
     for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
         baket.film_baket[i].tip = DVA;
         baket.film_baket[i].prosecna_ocena = 0;
-        baket.film_baket[i].evidencioni_broj[0] = '\0';
+        baket.film_baket[i].evidencioni_broj = 0;
         baket.film_baket[i].naziv[0] = '\0';
         baket.film_baket[i].duzina_trajanja = 0;
         baket.film_baket[i].vreme_i_datum[0] = '\0';
+        baket.film_baket[i].oznaka_sale[0] = '\0';
         baket.film_baket[i].status = false;
     }
 
     for (unsigned int j = 0; j < BROJ_BAKETA; j++) {
-      if (fwrite(&baket, sizeof(struct baket), 1, datoteka) != 1) {
-          puts("Greska prilikom upisa u datoteku!\n");
-      }
+        if (fwrite(&baket, sizeof(struct baket), 1, datoteka) != 1) {
+            puts("Greska prilikom upisa u datoteku!\n");
+        }
     }
 
     printf("\nDatoteka <%s> uspesno kreirana!", temp);
@@ -58,40 +59,84 @@ void otvori_datoteku(char* temp) {
 }
 
 int transformacija_kljuca(int kljuc) {
-  return kljuc % BROJ_BAKETA + 1;
+    return kljuc % BROJ_BAKETA + 1;
 }
 
 pretraga pronadji_zapis(FILE* dat, int kljuc) {
-  int adresa = transformacija_kljuca(kljuc);
-  int a = 2;
-  pretraga pretraga;
-  baket baket;
+    int adresa = transformacija_kljuca(kljuc);
+    int a = 2;
+    pretraga pretraga;
+    baket baket;
 
-  do {
-      fseek(dat,sizeof(baket) * (adresa - 1), SEEK_SET );
-      if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
-          printf("Greska prilikom citanja datoteke u toku pretrage.");
-          a = 0;
-          return;
-      }
-      for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
-          if (!baket.film_baket[i].status ) {
-              pretraga.broj = i;
-              pretraga.pozicija = sizeof(baket) * (adresa - 1);
-              pretraga.status = false;
-              a = 1;
-              return pretraga;
-          }
-          if (baket.film_baket[i].evidencioni_broj == kljuc) {
-              pretraga.broj =i;
-              pretraga.pozicija = sizeof(baket) * (adresa - 1);
-              pretraga.status = true;
-              a = 1;
-              return pretraga;
-          }
-          if (i == 2) {
-              adresa++;
-          }
-      }
-  } while(a == 2);
+    do {
+        fseek(dat,sizeof(baket) * (adresa - 1), SEEK_SET );
+        if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
+            printf("Greska prilikom citanja datoteke u toku pretrage.");
+            a = 0;
+            return;
+        }
+        for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
+            if (!baket.film_baket[i].status ) {
+                pretraga.broj = i;
+                pretraga.pozicija = sizeof(baket) * (adresa - 1);
+                pretraga.status = false;
+                a = 1;
+                return pretraga;
+            }
+            if (baket.film_baket[i].evidencioni_broj == kljuc) {
+                pretraga.broj =i;
+                pretraga.pozicija = sizeof(baket) * (adresa - 1);
+                pretraga.status = true;
+                a = 1;
+                return pretraga;
+            }
+            if (i == 2) {
+                adresa++;
+            }
+        }
+    } while(a == 2);
+}
+
+void dodaj_zapis() {
+    film film;
+
+    do {
+        printf("\nUnesite evidencioni broj filma[%d cifara]: ", EVIDENCIJA);
+        scanf("%d", &film.evidencioni_broj);
+    } while (film.evidencioni_broj < 10000 || film.evidencioni_broj > 99999 );
+
+    do {
+        printf("\nUnesite naziv filma[%d karaktera]: ", MAX_NAZIV);
+        scanf("%s", film.naziv);
+    } while (strlen(film.naziv) > MAX_NAZIV);
+
+    do {
+        printf("\nUnesite prosecnu ocenu[1-5]: ");
+    } while (film.prosecna_ocena < 1 || film.prosecna_ocena > 5);
+
+    do {
+        printf("\nUnesite vreme i datum prikazivanja filma[%d cifri]: ", DATE_TIME);
+        scanf("%s", film.vreme_i_datum);
+    } while (strlen(film.vreme_i_datum) > DATE_TIME);
+
+    do {
+        printf("\nUnesite oznaku sale u kojoj se prikazuje film[%d karaktera]: ", MAX_SALA);
+        scanf("%s", film.oznaka_sale);
+    } while (strlen(film.oznaka_sale) > MAX_SALA);
+
+    do {
+        printf("\nOdaberite tip projekcije[2/3/4]: ");
+        scanf("%d", &film.tip);
+    } while (film.tip < 2 || film.tip > 4);
+
+    do {
+        printf("\nUnesite duzinu trajanja filma u minutima[do %d minuta]:", MAX_TRAJANJE);
+        scanf("%d", &film.duzina_trajanja);
+    } while (film.duzina_trajanja < 0 || film.duzina_trajanja > MAX_TRAJANJE);
+
+    film.status = true;
+    if ((fwrite(&film, sizeof(film), 1, pomocna_datoteka)) != 1) {
+        puts("\nGreska prilikom ucitavanja datoteke.");
+    }
+    puts ("Slog uspesno dodat.");
 }

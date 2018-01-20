@@ -5,18 +5,19 @@
 #include "definitions.h"
 
 typedef enum tip_projekcije {
-    DVA,
-    TRI,
-    CETIRI
+    DVA = 2,
+    TRI = 3,
+    CETIRI = 4
 } tip_projekcije;
 
 struct film {
+    int evidencioni_broj;
+    char naziv[MAX_NAZIV];
     tip_projekcije tip;
     int prosecna_ocena;
-    char evidencioni_broj[EVIDENCIJA];
-    char naziv[MAX_NAZIV];
     int duzina_trajanja;
-    char vreme_i_datum[12]; //dd mm yyyy hh mm
+    char oznaka_sale[MAX_SALA];
+    char vreme_i_datum[DATE_TIME]; //dd mm yyyy hh mm
     bool status;
     struct film *sledeci;
 };
@@ -31,9 +32,10 @@ struct pretraga {
     bool status;
 };
 
-int transformacija_kljuca(int kljuc);
-void napravi_datoteku(char* temp);
-void otvori_datoteku(char* temp);
-pretraga pronadji_zapis(FILE* dat, int kljuc);
+int transformacija_kljuca(int);
+void napravi_datoteku(char*);
+void otvori_datoteku(char*);
+pretraga pronadji_zapis(FILE*, int);
+void dodaj_zapis();
 
 #endif /* BIGCINESTAR_H */
