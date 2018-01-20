@@ -17,9 +17,7 @@ int main() {
 
 void napravi_datoteku(char* temp) {
     printf("Kreiram datoteku...\n");
-
-    struct baket baket;
-    struct film film;
+    baket baket;
 
     if ((datoteka = fopen(temp, "wb+")) == NULL) {
         printf("\nDatoteka %s nije kreirana!", temp);
@@ -61,4 +59,39 @@ void otvori_datoteku(char* temp) {
 
 int transformacija_kljuca(int kljuc) {
   return kljuc % BROJ_BAKETA + 1;
+}
+
+pretraga pronadji_zapis(FILE* dat, int kljuc) {
+  int adresa = transformacija_kljuca(kljuc);
+  int a = 2;
+  pretraga pretraga;
+  baket baket;
+
+  do {
+      fseek(dat,sizeof(baket) * (adresa - 1), SEEK_SET );
+      if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
+          printf("Greska prilikom citanja datoteke u toku pretrage.");
+          a = 0;
+          return;
+      }
+      for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
+          if (!baket.film_baket[i].status ) {
+              pretraga.broj = i;
+              pretraga.pozicija = sizeof(baket) * (adresa - 1);
+              pretraga.status = false;
+              a = 1;
+              return pretraga;
+          }
+          if (baket.film_baket[i].evidencioni_broj == kljuc) {
+              pretraga.broj =i;
+              pretraga.pozicija = sizeof(baket) * (adresa - 1);
+              pretraga.status = true;
+              a = 1;
+              return pretraga;
+          }
+          if (i == 2) {
+              adresa++;
+          }
+      }
+  } while(a == 2);
 }
