@@ -25,7 +25,7 @@ struct baket {
     film film_baket[FAKTOR_BAKETIRANJA];
 };
 
-struct trazi {
+struct pretraga {
     int pozicija;
     int broj;
     bool status;

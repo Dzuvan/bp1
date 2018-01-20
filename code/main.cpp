@@ -59,3 +59,6 @@ void otvori_datoteku(char* temp) {
     strcpy(aktivna_datoteka, temp);
 }
 
+int transformacija_kljuca(int kljuc) {
+  return kljuc % BROJ_BAKETA + 1;
+}
