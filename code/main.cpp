@@ -84,7 +84,7 @@ pretraga pronadji_zapis(FILE* dat, int kljuc) {
                 return pretraga;
             }
             if (baket.film_baket[i].evidencioni_broj == kljuc) {
-                pretraga.broj =i;
+                pretraga.broj = i;
                 pretraga.pozicija = sizeof(baket) * (adresa - 1);
                 pretraga.status = true;
                 a = 1;
@@ -140,3 +140,47 @@ void dodaj_zapis() {
     }
     puts ("Slog uspesno dodat.");
 }
+
+void napravi_glavnu_datoteku() {
+    baket baket;
+    film film;
+    pretraga pretraga;
+    int adresa;
+    int i;
+
+    for (adresa = 0; adresa < FAKTOR_BAKETIRANJA * BROJ_BAKETA; adresa ++) {
+        fseek(pomocna_datoteka, sizeof(film) * adresa, SEEK_SET);
+        if (fread(&film, sizeof(film), 1, pomocna_datoteka) != 1) {
+            printf("\nGreska prilikom citanja pomocne datoteke.");
+            return;
+        }
+        pretraga = pronadji_zapis(datoteka, film.evidencioni_broj);
+        if (pretraga.status == false) {
+            i = pretraga.broj;
+            fseek(datoteka, pretraga.pozicija, SEEK_SET);
+            if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
+                printf("\nGreska prilikom citanja glavne datoteke.");
+                return;
+            }
+
+            baket.film_baket[i].evidencioni_broj = film.evidencioni_broj;
+            baket.film_baket[i].prosecna_ocena = film.prosecna_ocena;
+            baket.film_baket[i].duzina_trajanja = film.duzina_trajanja;
+            baket.film_baket[i].tip = film.tip;
+            baket.film_baket[i].status = film.status;
+            strcpy(baket.film_baket[i].naziv,film.naziv);
+            strcpy(baket.film_baket[i].vreme_i_datum, film.vreme_i_datum);
+            strcpy(baket.film_baket[i].oznaka_sale, film.oznaka_sale);
+
+            fseek(datoteka, pretraga.pozicija, SEEK_SET);
+            if ((fwrite(&baket, sizeof(baket), 1, datoteka) != 1)) {
+                puts("\nGreska prilikom upisa u glavnu datoteku");
+            }
+        }
+    }
+    if ((pomocna_datoteka = fopen("Help.bin", "wb+")) == NULL) {
+        printf("\nNeuspesno otvaranje pomocne datoteke");
+        fclose(pomocna_datoteka);
+    }
+}
+

@@ -37,5 +37,6 @@ void napravi_datoteku(char*);
 void otvori_datoteku(char*);
 pretraga pronadji_zapis(FILE*, int);
 void dodaj_zapis();
+void napravi_glavnu_datoteku();
 
 #endif /* BIGCINESTAR_H */
