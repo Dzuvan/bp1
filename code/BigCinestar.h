@@ -5,6 +5,7 @@
 #include "definitions.h"
 
 typedef enum tip_projekcije {
+    NULA = 0,
     DVA = 2,
     TRI = 3,
     CETIRI = 4
@@ -39,5 +40,7 @@ pretraga pronadji_slog(FILE*, int);
 void dodaj_slog();
 void napravi_glavnu_datoteku();
 void brisanje_sloga(int);
+void prikaz_slogova();
+void prikaz_menija();
 
 #endif /* BIGCINESTAR_H */

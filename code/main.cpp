@@ -9,10 +9,15 @@ FILE* datoteka;
 FILE* pomocna_datoteka;
 char aktivna_datoteka[20];
 char trenutna[20];
-int slog;
+int evidencioni_broj;
 
 int main() {
-    return 0;
+    if ((pomocna_datoteka = fopen("Help.bin", "wb+")) == NULL) {
+        printf("\nNeuspesno otvaranje pomocne datoteke!");
+        return 0;
+    }
+   prikaz_menija();
+   return 0;
 }
 
 void napravi_datoteku(char* temp) {
@@ -26,7 +31,7 @@ void napravi_datoteku(char* temp) {
     }
 
     for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
-        baket.film_baket[i].tip = DVA;
+        baket.film_baket[i].tip = NULA;
         baket.film_baket[i].prosecna_ocena = 0;
         baket.film_baket[i].evidencioni_broj = 0;
         baket.film_baket[i].naziv[0] = '\0';
@@ -73,7 +78,7 @@ pretraga pronadji_slog(FILE* dat, int kljuc) {
         if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
             printf("Greska prilikom citanja datoteke u toku pretrage!");
             a = 0;
-            return;
+            return pretraga;
         }
         for (unsigned int i = 0; i < FAKTOR_BAKETIRANJA; i++) {
             if (!baket.film_baket[i].status ) {
@@ -126,7 +131,7 @@ void dodaj_slog() {
 
     do {
         printf("\nOdaberite tip projekcije[2/3/4]: ");
-        scanf("%d", &film.tip);
+        scanf("%u", &film.tip);
     } while (film.tip < 2 || film.tip > 4);
 
     do {
@@ -199,4 +204,89 @@ void brisanje_sloga(int kljuc) {
     } else {
         printf("\nSlog ne postoji!");
     }
+}
+
+void prikaz_slogova() {
+    baket baket;
+
+    for (unsigned int i = 0; i < BROJ_BAKETA; i++) {
+        fseek(datoteka, sizeof(baket) * i, SEEK_SET);
+
+        if (fread(&baket, sizeof(baket), 1, datoteka)!= 1) {
+            printf("\nGreska prilikom citanja glavne datoteke!");
+            return;
+        }
+        printf("\nBaket sa adresom %d: ", i + 1);
+        for (unsigned int j = 0; j < FAKTOR_BAKETIRANJA; j++) {
+            printf("\n==========================================");
+            printf("\nAdresa sloga u baketu: %d", j + 1);
+            printf("\nEvidencioni broj je: %d", baket.film_baket[j].evidencioni_broj);
+            printf("\nNaziv filma je: %s", baket.film_baket[j].naziv);
+            printf("\nProsecna ocena filma je: %d", baket.film_baket[j].prosecna_ocena);
+            printf("\nVreme i datum projekcije: %s", baket.film_baket[j].vreme_i_datum);
+            printf("\nOznaka sale u kojoj se vrsi projekcija: %s", baket.film_baket[i].oznaka_sale);
+            printf("\nTip projekcije: %d", baket.film_baket[j].tip);
+            printf("\nDuzina tranja u minutima: %d", baket.film_baket[j].duzina_trajanja);
+            printf("\n==========================================");
+        }
+    }
+}
+
+void prikaz_menija() {
+    int a;
+    do {
+        puts("\n\n________________MENU_______________");
+        puts("\n1- Napravi novu datoteku.");
+        puts("\n2- Odaberi aktivnu datoteku.");
+        puts("\n3- Prikazi naziv aktivne datoteke.");
+        puts("\n4- Upisi novi slog.");
+        puts("\n5- Napravi aktivnou datoteku.");
+        puts("\n6- Prikazi sve slogove.");
+        puts("\n7- Obrisi trenutni slog");
+        puts("\n8- Izlaz");
+        puts("\n_____________________________________");
+        printf("Unesite vas izbor: ");
+        scanf("%d", &a);
+
+        switch (a) {
+            case 1:
+                {
+                    printf("Unesite naziv: ");
+                    scanf("%s", aktivna_datoteka);
+                    napravi_datoteku(aktivna_datoteka);
+                } break;
+            case 2:
+                {
+                    printf("Unesite naziv: ");
+                    scanf("%s", trenutna);
+                    otvori_datoteku(trenutna);
+                } break;
+            case 3:
+                {
+                    printf("Aktivna datoteka: \n%s", aktivna_datoteka);
+                } break;
+            case 4:
+                {
+                    dodaj_slog();
+                } break;
+            case 5:
+                {
+                    napravi_glavnu_datoteku();
+                } break;
+            case 6:
+                {
+                    prikaz_slogova();
+                } break;
+            case 7:
+                {
+                    printf("Unesite evidencioni broj filma koji zelite da obrisete: ");
+                    scanf("%d",&evidencioni_broj);
+                    brisanje_sloga(evidencioni_broj);
+                } break;
+            case 8:
+                {
+                    exit(1);
+                } break;
+        }
+    } while (a > 0 || a < 10);
 }
