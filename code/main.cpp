@@ -9,7 +9,7 @@ FILE* datoteka;
 FILE* pomocna_datoteka;
 char aktivna_datoteka[20];
 char trenutna[20];
-int zapis;
+int slog;
 
 int main() {
     return 0;
@@ -42,7 +42,7 @@ void napravi_datoteku(char* temp) {
         }
     }
 
-    printf("\nDatoteka <%s> uspesno kreirana!", temp);
+    printf("\nDatoteka <%s> uspesno kreirana.", temp);
     strcpy(aktivna_datoteka, temp);
 }
 
@@ -54,7 +54,7 @@ void otvori_datoteku(char* temp) {
         printf("\nDatoteka <%s> ne postoji", temp);
         return;
     }
-    printf("Datoteka <%s> uspesno otvorena", temp);
+    printf("Datoteka <%s> uspesno otvorena.", temp);
     strcpy(aktivna_datoteka, temp);
 }
 
@@ -62,7 +62,7 @@ int transformacija_kljuca(int kljuc) {
     return kljuc % BROJ_BAKETA + 1;
 }
 
-pretraga pronadji_zapis(FILE* dat, int kljuc) {
+pretraga pronadji_slog(FILE* dat, int kljuc) {
     int adresa = transformacija_kljuca(kljuc);
     int a = 2;
     pretraga pretraga;
@@ -71,7 +71,7 @@ pretraga pronadji_zapis(FILE* dat, int kljuc) {
     do {
         fseek(dat,sizeof(baket) * (adresa - 1), SEEK_SET );
         if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
-            printf("Greska prilikom citanja datoteke u toku pretrage.");
+            printf("Greska prilikom citanja datoteke u toku pretrage!");
             a = 0;
             return;
         }
@@ -97,7 +97,7 @@ pretraga pronadji_zapis(FILE* dat, int kljuc) {
     } while(a == 2);
 }
 
-void dodaj_zapis() {
+void dodaj_slog() {
     film film;
 
     do {
@@ -136,7 +136,7 @@ void dodaj_zapis() {
 
     film.status = true;
     if ((fwrite(&film, sizeof(film), 1, pomocna_datoteka)) != 1) {
-        puts("\nGreska prilikom ucitavanja datoteke.");
+        puts("\nGreska prilikom ucitavanja datoteke!");
     }
     puts ("Slog uspesno dodat.");
 }
@@ -151,15 +151,15 @@ void napravi_glavnu_datoteku() {
     for (adresa = 0; adresa < FAKTOR_BAKETIRANJA * BROJ_BAKETA; adresa ++) {
         fseek(pomocna_datoteka, sizeof(film) * adresa, SEEK_SET);
         if (fread(&film, sizeof(film), 1, pomocna_datoteka) != 1) {
-            printf("\nGreska prilikom citanja pomocne datoteke.");
+            printf("\nGreska prilikom citanja pomocne datoteke!");
             return;
         }
-        pretraga = pronadji_zapis(datoteka, film.evidencioni_broj);
+        pretraga = pronadji_slog(datoteka, film.evidencioni_broj);
         if (pretraga.status == false) {
             i = pretraga.broj;
             fseek(datoteka, pretraga.pozicija, SEEK_SET);
             if (fread(&baket, sizeof(baket), 1, datoteka) != 1) {
-                printf("\nGreska prilikom citanja glavne datoteke.");
+                printf("\nGreska prilikom citanja glavne datoteke!");
                 return;
             }
 
@@ -174,13 +174,29 @@ void napravi_glavnu_datoteku() {
 
             fseek(datoteka, pretraga.pozicija, SEEK_SET);
             if ((fwrite(&baket, sizeof(baket), 1, datoteka) != 1)) {
-                puts("\nGreska prilikom upisa u glavnu datoteku");
+                puts("\nGreska prilikom upisa u glavnu datoteku!");
             }
         }
     }
     if ((pomocna_datoteka = fopen("Help.bin", "wb+")) == NULL) {
-        printf("\nNeuspesno otvaranje pomocne datoteke");
+        printf("\nNeuspesno otvaranje pomocne datoteke!");
         fclose(pomocna_datoteka);
     }
 }
 
+void brisanje_sloga(int kljuc) {
+    baket baket;
+    pretraga pretraga;
+
+    pretraga = pronadji_slog(datoteka, kljuc);
+    if(pretraga.status) {
+        fseek(datoteka, pretraga.pozicija, SEEK_SET);
+        if(fread(&baket, sizeof(baket), 1, datoteka) != 1) {
+            printf("\nGreska prilikom ucitavanja glavne datoteke!");
+            return;
+        }
+        baket.film_baket[pretraga.broj].status = false;
+    } else {
+        printf("\nSlog ne postoji!");
+    }
+}

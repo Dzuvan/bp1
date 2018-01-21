@@ -35,8 +35,9 @@ struct pretraga {
 int transformacija_kljuca(int);
 void napravi_datoteku(char*);
 void otvori_datoteku(char*);
-pretraga pronadji_zapis(FILE*, int);
-void dodaj_zapis();
+pretraga pronadji_slog(FILE*, int);
+void dodaj_slog();
 void napravi_glavnu_datoteku();
+void brisanje_sloga(int);
 
 #endif /* BIGCINESTAR_H */
